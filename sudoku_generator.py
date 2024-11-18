@@ -25,10 +25,12 @@ class SudokuGenerator:
     def __init__(self, row_length, removed_cells):
         self.row_length = row_length
         self.removed_cells = removed_cells
-        self.board_blank = [[[0, 0, 0] for i in range(3)] for i in range(row_length)]
         self.box_length = row_length**0.5
-        self.board = False
-        print("test")
+        self.board_blank = [[[0, 0, 0] for i in range(self.box_length)] for i in range(self.row_length)]
+        self.board_correct = False #used for generation of the final answer
+        self.board_original = False #used to see where valid player inputs are and the og board with spots removed
+        self.board = False #active player board
+
 
 
         '''
@@ -38,7 +40,7 @@ class SudokuGenerator:
 	Return: list[list]
     '''
     def get_board(self):
-        pass
+        return self.board
 
     '''
 	Displays the board to the console
@@ -76,7 +78,7 @@ class SudokuGenerator:
     '''
     def valid_in_col(self, col, num):
         for i in range(9): #iterate through the 9 rows(non inclusive bc indexing is 0-8). For below, i subtract one for same reason of list indexing starting at 0
-            if self.board_blank[i][(col-1)//3][(col-1)-3*((col-1)//3)] == num: #this works but calls wrong variable, the third index is computed that way because -1 gives the index and the 3* and //3 gives the index in the nested list
+            if self.board_blank[i][(col)//3][(col)-3*((col)//3)] == num: #this works but calls wrong variable, the third index is computed that way because -1 gives the index and the 3* and //3 gives the index in the nested list
                 return False #this is not a valid move
         return True #never found the num thus this is allowed
 
