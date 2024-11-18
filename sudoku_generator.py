@@ -75,7 +75,10 @@ class SudokuGenerator:
 	Return: boolean
     '''
     def valid_in_col(self, col, num):
-        pass
+        for i in range(9):
+            if self.board_blank[i][col//3][col] == num: #this works but calls wrong variable
+                return False #this is not a valid move
+        return True #never found the num thus this is allowed
 
     '''
 	Determines if num is contained in the 3x3 box specified on the board
@@ -126,7 +129,8 @@ class SudokuGenerator:
 	Return: None
     '''
     def fill_diagonal(self):
-        pass
+        for i in range(3):
+
 
     '''
     DO NOT CHANGE
