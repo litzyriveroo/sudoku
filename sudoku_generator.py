@@ -23,9 +23,12 @@ class SudokuGenerator:
 	None
     '''
     def __init__(self, row_length, removed_cells):
-        pass
+        board_back = [[[0, 0, 0] for i in range(3)] for i in range(9)]
 
-    '''
+        for i in range(9):
+            print(board_back[i])
+
+        '''
 	Returns a 2D python list of numbers which represents the board
 
 	Parameters: None
