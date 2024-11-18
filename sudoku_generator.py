@@ -28,7 +28,7 @@ class SudokuGenerator:
         self.board_blank = [[[0, 0, 0] for i in range(3)] for i in range(row_length)]
         self.box_length = row_length**0.5
         self.board = False
-
+        print("test")
 
 
         '''
