@@ -31,8 +31,8 @@ class SudokuGenerator:
         self.fill_diagonal()
         self.fill_remaining(0, 0)
         self.board_correct = copy.deepcopy(self.board)
-        self.board_original = False #used to see where valid player inputs are and the og board with spots removed
-
+        self.remove_cells()
+        self.board_original = copy.deepcopy(self.board)  #used to see where valid player inputs are and the og board with spots removed
 
 
 
@@ -223,7 +223,17 @@ class SudokuGenerator:
 	Return: None
     '''
     def remove_cells(self):
-        pass
+        past_cords = []
+        for i in range(0,self.removed_cells):
+            while True:
+                row = random.randrange(0, 9)
+                col = random.randrange(0, 9)
+                if [row,col] not in past_cords:
+                    past_cords += [row,col]
+                    self.board[row][col] = 0
+                    break
+
+
 
 '''
 DO NOT CHANGE
@@ -247,4 +257,5 @@ def generate_sudoku(size, removed):
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
+
 
