@@ -104,16 +104,7 @@ class SudokuGenerator:
                     return False
         return True
     
-    '''
-    Determines if it is valid to enter num at (row, col) in the board
-    This is done by checking that num is unused in the appropriate, row, column, and box
 
-	Parameters:
-	row and col are the row index and col index of the cell to check in the board
-	num is the value to test if it is safe to enter in this cell
-
-	Return: boolean
-    '''
     '''
     Fills the specified 3x3 box with values
     For each position, generates a random digit which has not yet been used in the box
