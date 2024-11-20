@@ -30,7 +30,7 @@ class SudokuGenerator:
         self.board = copy.deepcopy(self.board_blank)  # active player board ***TEMPORARILY**** Blank
         self.fill_diagonal()
         self.fill_remaining(0, 0)
-        self.board_correct = copy.deepcopy(self.board)
+        self.board_correct = copy.deepcopy(self.board) #used to see if matches correct answer
         self.remove_cells()
         self.board_original = copy.deepcopy(self.board)  #used to see where valid player inputs are and the og board with spots removed
 
@@ -259,3 +259,7 @@ def generate_sudoku(size, removed):
     return board
 
 
+x = SudokuGenerator(9,0)
+x.print_board()
+
+while True:
