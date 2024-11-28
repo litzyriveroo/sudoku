@@ -289,6 +289,35 @@ def draw_numbers(screen, board):
                 number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
 
+#class function to input users input into a singular cell
+class Cell:
+    def __init__ (self, value, row, col, screen):
+        self.value = value
+        self.row = row
+        self.col = col
+        self.screen = screen
+        self.sketched = 0
+        self.selected = False
+        self.width = 900 // 9
+        self.height = 900 // 9
+        self.x = col * self.width
+        self.y = row * self.height
+    def set_cell_value(self, value):
+        self.value = value
+    def set_sketched_value(self, value):
+        self.sketched = value
+    def draw(self):
+        rect = pygame.Rect(self.x,self.y,self.width,self.height)
+        if self.selected:
+            pygame.draw.rect(self.screen, (255, 0, 0), rect, 3) #outlines the selected cell red
+        else:
+            pygame.draw.rect(self.screen, (0, 0, 0), rect, 1) #returns to normal cell color
+        if self.value != 0:
+            font = pygame.font.Font(None, 60)
+            number = font.render(str(self.value), True, (0,0,0))
+            self.screen.blit(number, (self.col * 100 + 35, self.row * 100 + 25)) #centers the number inserted by the user
+
+
 
 def main():
     pygame.init()
@@ -296,15 +325,36 @@ def main():
     pygame.display.set_caption("Sudoku")
     screen.fill("light blue")
 
+    #Singular cell input
+    cells = [[Cell(0, row, col, screen) for col in range(9)] for row in range(9)]
+    selected = None
+
+
     # Generate the Sudoku board
     sudoku = SudokuGenerator(9, 20)  # 20 cells removed for the puzzle
     board = sudoku.get_board()
 
     while True:
+        for row in cells:
+            for cell in row:
+                cell.draw()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN: #number inserted if pressed by user
+                if selected is not None and event.key in range (pygame.K_1, pygame.K_9 + 1):
+                    selected.set_cell_value(event.key - pygame.K_0)
+            if event.type == pygame.MOUSEBUTTONDOWN: #clicked cell turns red
+                pos = pygame.mouse.get_pos()
+                cols = pos[0] // (900//9)
+                rows = pos[1] // (900// 9)
+                selected  = cells[rows][cols]
+                for row in cells:
+                    for col in row:
+                        col.selected = False
+                selected.selected = True
+
 
         # Clear the screen, draw grid, and numbers
         screen.fill("light blue")
