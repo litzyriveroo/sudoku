@@ -372,12 +372,15 @@ def main():
                 pos = pygame.mouse.get_pos()
                 cols = pos[0] // (900//9)
                 rows = pos[1] // (900// 9)
+                selected_cord = [rows, cols]
+                #the stuff below is only used by the Cell class so may not be needed if we delete it
                 selected  = cells[rows][cols]
-                selected_cord = [rows,cols]
                 for row in cells:
                     for col in row:
                         col.selected = False
                 selected.selected = True
+
+
 
 
         # Clear the screen, draw grid, and numbers
