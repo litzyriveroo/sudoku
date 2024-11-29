@@ -283,13 +283,17 @@ def draw_grid(screen):
         pygame.draw.line(screen, (0, 0, 0), (0, i * 100), (900, i * 100), width)  # Horizontal lines
 
 # Function to place numbers on the board
-def draw_numbers(screen, board,selected_cord):
+def draw_numbers(screen, board,selected_cord,sudoku_instance):
     font = pygame.font.Font(None, 60)  # Font for numbers
     for row in range(9):
         for col in range(9):
-            if board[row][col] != 0:  # Only display non-zero cells
+            if sudoku_instance.board_original[row][col] != 0: #original stuff is black and permanent
                 number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
+            elif board[row][col] != 0: #if it was zero origionally but is now a diff number the color is different because it us user input
+                number = font.render(str(board[row][col]), True, (89, 89, 89)) #user input is greyed out
+                screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
+                "Based on the example image I don't know if we need to center user input!!"
             if selected_cord != None:
                 if [row,col] == selected_cord:
                     rect = pygame.Rect(col * 900 // 9, row * 900 // 9, 900 // 9, 900 // 9)
@@ -377,7 +381,7 @@ def main():
         # Clear the screen, draw grid, and numbers
         screen.fill("light blue")
         draw_grid(screen)
-        draw_numbers(screen, board, selected_cord) #Can highlight the selected box
+        draw_numbers(screen, board, selected_cord, sudoku) #Can highlight the selected box. Also it needs the instance name to know which is user generated and which is OG
         # for row in cells:
         #     for cell in row:
         #         if cell.selected: #iterating through is super inefficient so just the selected cell matters
