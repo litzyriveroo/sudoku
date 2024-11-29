@@ -292,7 +292,7 @@ def draw_numbers(screen, board):
 def user_input_valid(input_pos,sudoku_instance):
     #input_pos should be iteratable with index 0 being an x cord and index 1 being y cord
     #sudoku_instance will always be "sudoku" (not a string tho) because that's the var we called it
-    print(sudoku_instance.board_original[input_pos[0]][input_pos[1]] == 0) #used for troubleshooting, will delete once confirmed working
+    print(sudoku_instance.board_original[input_pos[0]][input_pos[1]]) #used for troubleshooting, will delete once confirmed working
     if sudoku_instance.board_original[input_pos[0]][input_pos[1]] == 0:
         return True
     return False
