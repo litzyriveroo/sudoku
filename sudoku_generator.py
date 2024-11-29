@@ -283,7 +283,7 @@ def draw_grid(screen):
         pygame.draw.line(screen, (0, 0, 0), (0, i * 100), (900, i * 100), width)  # Horizontal lines
 
 # Function to place numbers on the board
-def draw_numbers(screen, board,selected_cord,sudoku_instance):
+def draw_numbers(screen, board,selected_cord,sudoku_instance,sketched_list):
     font = pygame.font.Font(None, 60)  # Font for numbers
     for row in range(9):
         for col in range(9):
@@ -291,9 +291,11 @@ def draw_numbers(screen, board,selected_cord,sudoku_instance):
                 number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
             elif board[row][col] != 0: #if it was zero origionally but is now a diff number the color is different because it us user input
-                number = font.render(str(board[row][col]), True, (89, 89, 89)) #user input is greyed out
+                number = font.render(str(board[row][col]), True, (69, 69, 69)) #user input is greyed out
                 screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
-                "Based on the example image I don't know if we need to center user input!!"
+            elif sketched_list[row][col] != 0: #If it is a sketched value, no clue about significance
+                number = font.render(str(sketched_list[row][col]), True, (89, 89, 89))
+                screen.blit(number, (col * 100 , row * 100))  # DOES NOT center number in cells
             if selected_cord != None:
                 if [row,col] == selected_cord:
                     rect = pygame.Rect(col * 900 // 9, row * 900 // 9, 900 // 9, 900 // 9)
@@ -354,7 +356,7 @@ def main():
 
 
     selected_cord = None #NEEEDED DO NOT DELETE IF REMOVING CELL CLASS
-
+    sketched_values = [[0 for col in range(9)] for row in range(9)]
 
 
     while True:
@@ -367,8 +369,15 @@ def main():
                 if selected is not None and event.key in range (pygame.K_1, pygame.K_9 + 1):
                     if user_input_valid(selected_cord,sudoku): #checks to see if the cord can be edited and was origionally a zero
                         selected.set_cell_value(event.key - pygame.K_0)
-                        board[selected_cord[0]][selected_cord[1]] = event.key - pygame.K_0 #needed because draw_numbers uses board and not the class
-                        #this does not change the value of the spot inside the sudoku class, just the board variable made earlier
+                        sketched_values[selected_cord[0]][selected_cord[1]] = event.key - pygame.K_0 #used for the sketched value which is still WIP
+
+
+                        #if enter key is pressed on a sketched value:
+                            #that value becomes darker??? Not really clear in the guidelines
+                        "the following code is correct and is just saved for when the enter key statement is added"
+                            # board[selected_cord[0]][selected_cord[
+                            #     1]] = event.key - pygame.K_0  # needed because draw_numbers uses board and not the class
+                            # # this does not change the value of the spot inside the sudoku class, just the board variable made earlier
             if event.type == pygame.MOUSEBUTTONDOWN: #clicked cell turns red
                 pos = pygame.mouse.get_pos()
                 cols = pos[0] // (900//9)
@@ -387,7 +396,7 @@ def main():
         # Clear the screen, draw grid, and numbers
         screen.fill("light blue")
         draw_grid(screen)
-        draw_numbers(screen, board, selected_cord, sudoku) #Can highlight the selected box. Also it needs the instance name to know which is user generated and which is OG
+        draw_numbers(screen, board, selected_cord, sudoku,sketched_values) #Can highlight the selected box. Also it needs the instance name to know which is user generated and which is OG
         # for row in cells:
         #     for cell in row:
         #         if cell.selected: #iterating through is super inefficient so just the selected cell matters
