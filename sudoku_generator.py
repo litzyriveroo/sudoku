@@ -317,14 +317,14 @@ class Cell:
     def draw(self):
         rect = pygame.Rect(self.x,self.y,self.width,self.height)
         if self.selected:
-            pygame.draw.rect(self.screen, (255, 0, 0), rect, 5) #outlines the selected cell red
+            pygame.draw.rect(self.screen, (255, 0, 0), rect, 3) #outlines the selected cell red
         else:
             pygame.draw.rect(self.screen, (0, 0, 0), rect, 1) #returns to normal cell color
         if self.value != 0:
             font = pygame.font.Font(None, 60)
             number = font.render(str(self.value), True, (0,0,0))
             self.screen.blit(number, (self.col * 100 + 35, self.row * 100 + 25)) #centers the number inserted by the user
-        pygame.display.update()
+
 
 
 def main():
@@ -333,21 +333,20 @@ def main():
     pygame.display.set_caption("Sudoku")
     screen.fill("light blue")
 
-
-
     # Generate the Sudoku board
     sudoku = SudokuGenerator(9, 20)  # 20 cells removed for the puzzle
     board = sudoku.get_board()
 
-
-    # Singular cell input
-    cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(
-        9)]  # cells is a list like board but is class instead of values (april may change that for printing debugging purposes)
+    "The class is super inefficient but is good for the selected box"
+    #Singular cell input
+    #I changed value to be from the indexed board
+    cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
     selected = None
 
+
+
+
     while True:
-
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -361,26 +360,20 @@ def main():
                 cols = pos[0] // (900//9)
                 rows = pos[1] // (900// 9)
                 selected  = cells[rows][cols]
-                print(selected)
                 for row in cells:
-                     for col in row:
+                    for col in row:
                         col.selected = False
                 selected.selected = True
-                print(selected.selected)
-                selected.draw()
+
+
         # Clear the screen, draw grid, and numbers
         screen.fill("light blue")
         draw_grid(screen)
-        draw_numbers(screen, board)
-        # I moved the function below outside the while loop bc the end of the loop already does this - April
-        for row in cells:  # draws blank cells
+        draw_numbers(screen, board) #Very efficient so using this for now
+        for row in cells:
             for cell in row:
-                if cell.selected:
+                if cell.selected: #iterating through is super inefficient so just the selected cell matters
                     cell.draw()
-
-
-
-
 
         pygame.display.update()
 
