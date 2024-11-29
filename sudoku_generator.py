@@ -368,6 +368,7 @@ def main():
                     if user_input_valid(selected_cord,sudoku): #checks to see if the cord can be edited and was origionally a zero
                         selected.set_cell_value(event.key - pygame.K_0)
                         board[selected_cord[0]][selected_cord[1]] = event.key - pygame.K_0 #needed because draw_numbers uses board and not the class
+                        #this does not change the value of the spot inside the sudoku class, just the board variable made earlier
             if event.type == pygame.MOUSEBUTTONDOWN: #clicked cell turns red
                 pos = pygame.mouse.get_pos()
                 cols = pos[0] // (900//9)
