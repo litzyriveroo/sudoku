@@ -351,7 +351,9 @@ def main():
     #I changed value to be from the indexed board
     cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
     selected = None
-    selected_cord = None
+
+
+    selected_cord = None #NEEEDED DO NOT DELETE IF REMOVING CELL CLASS
 
 
 
