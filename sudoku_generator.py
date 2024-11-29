@@ -3,6 +3,8 @@ import copy
 import pygame
 import sys
 
+from pygame.event import set_keyboard_grab
+
 """
 This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
 https://www.geeksforgeeks.org/program-sudoku-generator/
@@ -281,18 +283,21 @@ def draw_grid(screen):
         pygame.draw.line(screen, (0, 0, 0), (0, i * 100), (900, i * 100), width)  # Horizontal lines
 
 # Function to place numbers on the board
-def draw_numbers(screen, board):
+def draw_numbers(screen, board,selected_cord):
     font = pygame.font.Font(None, 60)  # Font for numbers
     for row in range(9):
         for col in range(9):
             if board[row][col] != 0:  # Only display non-zero cells
                 number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
+            if selected_cord != None:
+                if [row,col] == selected_cord:
+                    rect = pygame.Rect(col * 900 // 9, row * 900 // 9, 900 // 9, 900 // 9)
+                    pygame.draw.rect(screen, (255, 0, 0), rect, 3)
 
 def user_input_valid(input_pos,sudoku_instance):
     #input_pos should be iteratable with index 0 being an x cord and index 1 being y cord
     #sudoku_instance will always be "sudoku" (not a string tho) because that's the var we called it
-    print(sudoku_instance.board_original[input_pos[0]][input_pos[1]]) #used for troubleshooting, will delete once confirmed working
     if sudoku_instance.board_original[input_pos[0]][input_pos[1]] == 0:
         return True
     return False
@@ -342,7 +347,7 @@ def main():
     #I changed value to be from the indexed board
     cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
     selected = None
-
+    selected_cord = None
 
 
 
@@ -354,12 +359,15 @@ def main():
                 sys.exit()
             if event.type == pygame.KEYDOWN: #number inserted if pressed by user
                 if selected is not None and event.key in range (pygame.K_1, pygame.K_9 + 1):
-                    selected.set_cell_value(event.key - pygame.K_0)
+                    if user_input_valid(selected_cord,sudoku): #checks to see if the cord can be edited and was origionally a zero
+                        selected.set_cell_value(event.key - pygame.K_0)
+                        board[selected_cord[0]][selected_cord[1]] = event.key - pygame.K_0 #needed because draw_numbers uses board and not the class
             if event.type == pygame.MOUSEBUTTONDOWN: #clicked cell turns red
                 pos = pygame.mouse.get_pos()
                 cols = pos[0] // (900//9)
                 rows = pos[1] // (900// 9)
                 selected  = cells[rows][cols]
+                selected_cord = [rows,cols]
                 for row in cells:
                     for col in row:
                         col.selected = False
@@ -369,11 +377,11 @@ def main():
         # Clear the screen, draw grid, and numbers
         screen.fill("light blue")
         draw_grid(screen)
-        draw_numbers(screen, board) #Very efficient so using this for now
-        for row in cells:
-            for cell in row:
-                if cell.selected: #iterating through is super inefficient so just the selected cell matters
-                    cell.draw()
+        draw_numbers(screen, board, selected_cord) #Can highlight the selected box
+        # for row in cells:
+        #     for cell in row:
+        #         if cell.selected: #iterating through is super inefficient so just the selected cell matters
+        #             cell.draw()
 
         pygame.display.update()
 
