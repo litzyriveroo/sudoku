@@ -245,7 +245,7 @@ class SudokuGenerator:
                 row = random.randrange(0, 9)
                 col = random.randrange(0, 9)
                 if [row, col] not in past_cords:
-                    past_cords += [row, col]
+                    past_cords.append([row, col])
                     self.board[row][col] = 0
                     break
 
@@ -283,23 +283,28 @@ def draw_grid(screen):
         pygame.draw.line(screen, (0, 0, 0), (0, i * 100), (900, i * 100), width)  # Horizontal lines
 
 # Function to place numbers on the board
-def draw_numbers(screen, board,selected_cord,sudoku_instance,sketched_list):
+def draw_numbers(screen, board, selected_cord, sudoku_instance, sketched_list):
     font = pygame.font.Font(None, 60)  # Font for numbers
     for row in range(9):
         for col in range(9):
-            if sudoku_instance.board_original[row][col] != 0: #original stuff is black and permanent
-                number = font.render(str(board[row][col]), True, (0, 0, 0))
-                screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
-            elif board[row][col] != 0: #if it was zero origionally but is now a diff number the color is different because it us user input
-                number = font.render(str(board[row][col]), True, (69, 69, 69)) #user input is greyed out
-                screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
-            elif sketched_list[row][col] != 0: #If it is a sketched value, no clue about significance
-                number = font.render(str(sketched_list[row][col]), True, (89, 89, 89))
-                screen.blit(number, (col * 100 , row * 100))  # DOES NOT center number in cells
-            if selected_cord != None:
-                if [row,col] == selected_cord:
-                    rect = pygame.Rect(col * 900 // 9, row * 900 // 9, 900 // 9, 900 // 9)
-                    pygame.draw.rect(screen, (255, 0, 0), rect, 3)
+            for value in sketched_list:
+                # Draw numbers
+                if sudoku_instance.board_original[row][col] != 0:  # Permanent numbers
+                    number = font.render(str(board[row][col]), True, (0, 0, 0))
+                    screen.blit(number, (col * 100 + 35, row * 100 + 25))  # Center numbers in cells
+                elif board[row][col] != 0:  # User input
+                    number = font.render(str(board[row][col]), True, (0, 0, 0))   # make (69,69,69) if you want it to turn gray after hitting enter
+                    screen.blit(number, (col * 100 + 35, row * 100 + 25))
+                elif sketched_list[row][col] != 0:  # Sketched values
+                    number = font.render(str(sketched_list[row][col]), True, (69, 69, 69))  # Sketched in grey
+                    screen.blit(number, (col * 100, row * 100))  # Position the number
+
+            # Highlight the selected cell
+            if selected_cord != None and [row, col] == selected_cord:
+                rect = pygame.Rect(col * 100, row * 100, 100, 100)
+                pygame.draw.rect(screen, (255, 0, 0), rect, 3)
+
+
 
 def user_input_valid(input_pos,sudoku_instance):
     #input_pos should be iteratable with index 0 being an x cord and index 1 being y cord
@@ -307,6 +312,21 @@ def user_input_valid(input_pos,sudoku_instance):
     if sudoku_instance.board_original[input_pos[0]][input_pos[1]] == 0:
         return True
     return False
+
+def check_win(board, sudoku_instance):
+    if board == sudoku_instance.board_correct:
+        return True
+    else:
+        return False
+
+def check_full(board):
+    # Iterate through the board and check if there's any empty cell (value = 0)
+    for row in range(9):
+        for col in range(9):
+            if board[row][col] == 0:
+                return False  # Found an empty cell, return False
+    return True  # All cells are filled
+
 
 #class function to input users input into a singular cell
 class Cell:
@@ -321,88 +341,190 @@ class Cell:
         self.height = 900 // 9
         self.x = col * self.width
         self.y = row * self.height
+
     def set_cell_value(self, value):
         self.value = value
+
     def set_sketched_value(self, value):
         self.sketched = value
-    def draw(self):
-        rect = pygame.Rect(self.x,self.y,self.width,self.height)
-        if self.selected:
-            pygame.draw.rect(self.screen, (255, 0, 0), rect, 3) #outlines the selected cell red
-        else:
-            pygame.draw.rect(self.screen, (0, 0, 0), rect, 1) #returns to normal cell color
-        if self.value != 0:
-            font = pygame.font.Font(None, 60)
-            number = font.render(str(self.value), True, (0,0,0))
-            self.screen.blit(number, (self.col * 100 + 35, self.row * 100 + 25)) #centers the number inserted by the user
 
+    def draw(self):
+        rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        pygame.draw.rect(self.screen, (255, 0, 0) if self.selected else (0, 0, 0), rect, 3 if self.selected else 1)
+        font = pygame.font.Font(None, 60)
+        if self.value != 0:
+            number = font.render(str(self.value), True, (0, 0, 0))
+            self.screen.blit(number, (self.x + 35, self.y + 25))  # Center numbers
+        elif self.sketched != 0:
+            sketched_number = font.render(str(self.sketched), True, (100, 100, 100))
+            self.screen.blit(sketched_number, (self.x + 10, self.y + 10))  # Top-left alignment for sketched numbers
 
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((900, 900))
     pygame.display.set_caption("Sudoku")
-    screen.fill("light blue")
+    menu_bg = pygame.image.load('menu_bg2.png')
+    menu_bg = pygame.transform.scale(menu_bg, (900, 900))
 
-    # Generate the Sudoku board
-    sudoku = SudokuGenerator(9, 20)  # 20 cells removed for the puzzle
-    board = sudoku.get_board()
+    font = pygame.font.SysFont('Arial', 61)
+    easy_text = font.render("Easy", True, (255, 255, 255))
+    medium_text = font.render("Medium", True, (255,255,255))
+    hard_text = font.render("Hard", True, (255,255,255))
+    easy_rect = easy_text.get_rect(center = (160, 575))
+    medium_rect = easy_text.get_rect(center=(412, 575))
+    hard_rect = easy_text.get_rect(center=(740, 575))
 
-    "The class is super inefficient but is good for the selected box"
-    #Singular cell input
-    #I changed value to be from the indexed board
-    cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
-    selected = None
+    screen.blit(menu_bg, (0, 0))
+    screen.blit(easy_text, easy_rect)
+    screen.blit(medium_text, medium_rect)
+    screen.blit(hard_text, hard_rect)
+    pygame.display.update()
 
 
-    selected_cord = None #NEEEDED DO NOT DELETE IF REMOVING CELL CLASS
-    sketched_values = [[0 for col in range(9)] for row in range(9)]
+    bg_image_game_over = pygame.image.load('game_over5.png')
+    bg_image_game_over = pygame.transform.scale(bg_image_game_over, (900, 900))
+    bg_image_game_won = pygame.image.load('game_won5.png')
+    bg_image_game_won = pygame.transform.scale(bg_image_game_won, (900, 900))
 
+    restart_font = pygame.font.SysFont('Arial', 61)
+    restart_text = restart_font.render("Restart", True, (255, 255, 255))  # "Restart" text
+    restart_rect = restart_text.get_rect(center=(470, 520))  # Position the restart button
 
-    while True:
+    # # Generate the Sudoku board
+    # sudoku = SudokuGenerator(9, 20)  # 20 cells removed for the puzzle
+    # screen.fill("light blue")
+    # board = sudoku.get_board()
+    #
+    # "The class is super inefficient but is good for the selected box"
+    # #Singular cell input
+    # #I changed value to be from the indexed board
+    # cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
+    # selected = None
+    #
+    #
+    # selected_cord = None #NEEEDED DO NOT DELETE IF REMOVING CELL CLASS
+    # # sketched_values = [[[] for col in range(9)] for row in range(9)]
+    # sketched_values = [[0 for col in range(9)] for row in range(9)]
+    # game_over = False
 
+    difficulty_selected = False
+    while not difficulty_selected:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN: #number inserted if pressed by user
-                if selected is not None and event.key in range (pygame.K_1, pygame.K_9 + 1):
-                    if user_input_valid(selected_cord,sudoku): #checks to see if the cord can be edited and was origionally a zero
-                        selected.set_cell_value(event.key - pygame.K_0)
-                        sketched_values[selected_cord[0]][selected_cord[1]] = event.key - pygame.K_0 #used for the sketched value which is still WIP
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if easy_rect.collidepoint(pos):
+                    difficulty_selected = True
+                    cells_removed = 30
+                    sudoku = SudokuGenerator(9, cells_removed)
+                elif medium_rect.collidepoint(pos):
+                    difficulty_selected = True
+                    cells_removed = 40
+                    sudoku = SudokuGenerator(9, cells_removed)
+                else:
+                    difficulty_selected = True
+                    cells_removed = 50
+                    sudoku = SudokuGenerator(9, cells_removed)
 
-                        #if enter key is pressed on a sketched value:
-                            #that value becomes darker??? Not really clear in the guidelines
-                        "the following code is correct and is just saved for when the enter key statement is added"
+    screen.fill("light blue")
+    board = sudoku.get_board()
+
+    # Singular cell input
+    cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
+    selected = None
+    selected_cord = None
+    sketched_values = [[0 for col in range(9)] for row in range(9)]
+    game_over = False
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if not game_over:
+                if event.type == pygame.KEYDOWN:  # number inserted if pressed by user
+                    if selected is not None:
+                        if event.key in range(pygame.K_1, pygame.K_9 + 1):  # Check number input
+                            if user_input_valid(selected_cord, sudoku):
+                                sketched_values[selected_cord[0]][selected_cord[1]] = event.key - pygame.K_0
+                        elif event.key == pygame.K_RETURN:  # Finalize sketched value
+                            if sketched_values[selected_cord[0]][selected_cord[1]] != 0:
+                                value = sketched_values[selected_cord[0]][selected_cord[1]]
+                                board[selected_cord[0]][selected_cord[1]] = value
+                                sketched_values[selected_cord[0]][selected_cord[1]] = 0
+                                selected.set_cell_value(value)
+
+                            # if enter key is pressed on a sketched value:
+                            # that value becomes darker??? Not really clear in the guidelines
+                            "the following code is correct and is just saved for when the enter key statement is added"
                             # board[selected_cord[0]][selected_cord[
                             #     1]] = event.key - pygame.K_0  # needed because draw_numbers uses board and not the class
                             # # this does not change the value of the spot inside the sudoku class, just the board variable made earlier
-            if event.type == pygame.MOUSEBUTTONDOWN: #clicked cell turns red
-                pos = pygame.mouse.get_pos()
-                cols = pos[0] // (900//9)
-                rows = pos[1] // (900// 9)
-                selected_cord = [rows, cols]
-                #the stuff below is only used by the Cell class so may not be needed if we delete it
-                selected  = cells[rows][cols]
+
+                if check_full(board):
+                    if check_win(board, sudoku):  # Check if the player wins
+                        screen.fill((255, 255, 255))
+                        screen.blit(bg_image_game_won, (0, 0))
+                        screen.blit(restart_text, restart_rect)
+                        pygame.display.update()
+                        game_over = True
+                    else:
+                        screen.fill((255, 255, 255))
+                        screen.blit(bg_image_game_over, (0, 0))
+                        screen.blit(restart_text, restart_rect)
+                        pygame.display.update()
+                        game_over = True
+
+                if event.type == pygame.MOUSEBUTTONDOWN:  # clicked cell turns red
+                    pos = pygame.mouse.get_pos()
+                    cols = pos[0] // (900 // 9)
+                    rows = pos[1] // (900 // 9)
+                    selected_cord = [rows, cols]
+
+                    # the stuff below is only used by the Cell class so may not be needed if we delete it
+                    selected = cells[rows][cols]
+                    for row in cells:
+                        for col in row:
+                            col.selected = False
+                    selected.selected = True
+
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if game_over and restart_rect.collidepoint(mouse_x, mouse_y):
+                    main()
+                    # print("yes")
+                    # screen = pygame.display.set_mode((900, 900))
+                    # pygame.display.set_caption("Sudoku")
+                    # screen.fill("light blue")
+                    #
+                    # sudoku = SudokuGenerator(9, cells_removed)  # 20 cells removed for the puzzle
+                    # board = sudoku.get_board()
+                    #
+                    # cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
+                    # selected = None
+                    #
+                    # selected_cord = None  # NEEEDED DO NOT DELETE IF REMOVING CELL CLASS
+                    # # sketched_values = [[[] for col in range(9)] for row in range(9)]
+                    # sketched_values = [[0 for col in range(9)] for row in range(9)]
+                    # game_over = False
+
+            if not game_over:
+                # Clear the screen, draw grid, and numbers
+                screen.fill("light blue")
+                draw_grid(screen)
+                draw_numbers(screen, board, selected_cord, sudoku,sketched_values) #Can highlight the selected box. Also it needs the instance name to know which is user generated and which is OG
                 for row in cells:
-                    for col in row:
-                        col.selected = False
-                selected.selected = True
+                    for cell in row:
+                        if cell.selected: #iterating through is super inefficient so just the selected cell matters
+                            cell.draw()
 
-
-
-
-        # Clear the screen, draw grid, and numbers
-        screen.fill("light blue")
-        draw_grid(screen)
-        draw_numbers(screen, board, selected_cord, sudoku,sketched_values) #Can highlight the selected box. Also it needs the instance name to know which is user generated and which is OG
-        # for row in cells:
-        #     for cell in row:
-        #         if cell.selected: #iterating through is super inefficient so just the selected cell matters
-        #             cell.draw()
-
-        pygame.display.update()
+                pygame.display.update()
 
 if __name__ == "__main__":
     main()
