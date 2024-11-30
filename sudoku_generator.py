@@ -301,7 +301,7 @@ def draw_numbers(screen, board, selected_cord, sudoku_instance, sketched_values)
                 number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 94 + 35, row * 94 + 25))
             elif board[row][col] != 0:  # User-input numbers
-                number = font.render(str(board[row][col]), True, (70, 70, 70)) #I changed this color because I want to know the difference between og and user stuff (also for debugging the crashes)
+                number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 94 + 35, row * 94 + 25))
             else:  # Sketched values
                 for idx, sketch in enumerate(sketched_values[row][col]):
@@ -379,12 +379,12 @@ def main():
     menu_bg = pygame.transform.scale(menu_bg, (900, 900))
 
     font1 = pygame.font.SysFont('Arial', 61)
-    easy_text = font1.render("Easy", True, (255, 255, 255))
-    medium_text = font1.render("Medium", True, (255,255,255))
-    hard_text = font1.render("Hard", True, (255,255,255))
+    easy_text = font1.render("Easy", True, (255, 255, 255), (250, 140, 0))
+    medium_text = font1.render("Medium", True, (255,255,255), (250, 140, 0))
+    hard_text = font1.render("Hard", True, (255,255,255), (250, 140, 0))
     easy_rect = easy_text.get_rect(center = (120, 575))
-    medium_rect = easy_text.get_rect(center=(387, 575))
-    hard_rect = easy_text.get_rect(center=(730, 575))
+    medium_rect = medium_text.get_rect(center=(427, 575))
+    hard_rect = hard_text.get_rect(center=(730, 575))
 
     screen.blit(menu_bg, (0, 0))
     screen.blit(easy_text, easy_rect)
@@ -395,9 +395,9 @@ def main():
     font2 = pygame.font.SysFont('Arial', 41)
     bg_image = pygame.image.load('game_bg.png')
     bg_image = pygame.transform.scale(bg_image, (900, 940))
-    reset_text = font2.render("Reset", True, (255, 255, 255))
-    restart_text_main = font2.render("Restart", True, (255, 255, 255))
-    exit_text = font2.render("Exit", True, (255, 255, 255))
+    reset_text = font2.render("Reset", True, (255, 255, 255), (250, 140, 0))
+    restart_text_main = font2.render("Restart", True, (255, 255, 255), (250, 140, 0))
+    exit_text = font2.render("Exit", True, (255, 255, 255), (250, 140, 0))
     reset_rect = reset_text.get_rect(center = (185, 872))
     restart_rect_main = restart_text_main.get_rect(center = (455, 872))
     exit_rect = exit_text.get_rect(center = (720, 872))
@@ -533,7 +533,7 @@ def main():
             if not game_over:
                 # Clear the screen, draw grid, and numbers
                 # screen.fill("light blue")
-                screen.blit(bg_image, (0, 0))
+                screen.fill("light blue")
                 draw_grid(screen)
                 draw_numbers(screen, board, selected_cord, sudoku,sketched_values) #Can highlight the selected box. Also it needs the instance name to know which is user generated and which is OG
                 screen.blit(reset_text, reset_rect)
