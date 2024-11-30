@@ -475,14 +475,14 @@ def main():
                                 if sketched_values[selected_cord[0]][selected_cord[1]]:
                                     # If not empty, retrieve the last sketched value
                                     value = sketched_values[selected_cord[0]][selected_cord[1]][-1]
-
-                                    if sudoku.is_valid(selected_cord[0], selected_cord[1], value):
+                                    "I noticed an issue below which is the wrong function is called and the else state"
+                                    if user_input_valid([selected_cord[0], selected_cord[1]], sudoku): #changed to be correct function
                                         # Set the value in the board and clear sketched values
                                         board[selected_cord[0]][selected_cord[1]] = value
                                         sketched_values[selected_cord[0]][selected_cord[1]] = []
-                                    else:
-                                        board[selected_cord[0]][selected_cord[1]] = value
-                                        sketched_values[selected_cord[0]][selected_cord[1]] = []
+                                    # else:
+                                    #     board[selected_cord[0]][selected_cord[1]] = value
+                                    #     sketched_values[selected_cord[0]][selected_cord[1]] = []
                         elif event.key == pygame.K_BACKSPACE:  # Remove the last sketched value
                             if selected_cord is not None:
                                 if sketched_values[selected_cord[0]][selected_cord[1]]:
