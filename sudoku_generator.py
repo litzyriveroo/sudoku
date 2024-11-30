@@ -340,35 +340,35 @@ def check_full(board):
 
 
 #class function to input users input into a singular cell
-class Cell:
-    def __init__ (self, value, row, col, screen):
-        self.value = value
-        self.row = row
-        self.col = col
-        self.screen = screen
-        self.sketched = 0
-        self.selected = False
-        self.width = 94
-        self.height = 94
-        self.x = col * self.width
-        self.y = row * self.height
-
-    def set_cell_value(self, value):
-        self.value = value
-
-    def set_sketched_value(self, value):
-        self.sketched = value
-
-    def draw(self):
-        rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        pygame.draw.rect(self.screen, (255, 0, 0) if self.selected else (0, 0, 0), rect, 3 if self.selected else 1)
-        font = pygame.font.Font(None, 60)
-        if self.value != 0:
-            number = font.render(str(self.value), True, (0, 0, 0))
-            self.screen.blit(number, (self.x + 35, self.y + 25))  # Center numbers
-        elif self.sketched != 0:
-            sketched_number = font.render(str(self.sketched), True, (100, 100, 100))
-            self.screen.blit(sketched_number, (self.x + 10, self.y + 10))  # Top-left alignment for sketched numbers
+# class Cell:
+#     def __init__ (self, value, row, col, screen):
+#         self.value = value
+#         self.row = row
+#         self.col = col
+#         self.screen = screen
+#         self.sketched = 0
+#         self.selected = False
+#         self.width = 94
+#         self.height = 94
+#         self.x = col * self.width
+#         self.y = row * self.height
+#
+#     def set_cell_value(self, value):
+#         self.value = value
+#
+#     def set_sketched_value(self, value):
+#         self.sketched = value
+#
+#     def draw(self):
+#         rect = pygame.Rect(self.x, self.y, self.width, self.height)
+#         pygame.draw.rect(self.screen, (255, 0, 0) if self.selected else (0, 0, 0), rect, 3 if self.selected else 1)
+#         font = pygame.font.Font(None, 60)
+#         if self.value != 0:
+#             number = font.render(str(self.value), True, (0, 0, 0))
+#             self.screen.blit(number, (self.x + 35, self.y + 25))  # Center numbers
+#         elif self.sketched != 0:
+#             sketched_number = font.render(str(self.sketched), True, (100, 100, 100))
+#             self.screen.blit(sketched_number, (self.x + 10, self.y + 10))  # Top-left alignment for sketched numbers
 
 
 def main():
@@ -391,6 +391,11 @@ def main():
     screen.blit(medium_text, medium_rect)
     screen.blit(hard_text, hard_rect)
     pygame.display.update()
+
+    # easy_rect.scale_by_ip(4, 2)
+    # medium_rect.scale_by_ip(4, 2)
+    # hard_rect.scale_by_ip(4, 2)
+
 
     font2 = pygame.font.SysFont('Arial', 41)
     bg_image = pygame.image.load('game_bg.png')
@@ -438,11 +443,11 @@ def main():
     board = sudoku.get_board()
 
     # Singular cell input
-    cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
-    selected = None
+    #cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
+    #selected = None
     selected_cord = None
     # sketched_values = [[0 for col in range(9)] for row in range(9)]
-    sketched_values = [[[] for col in range(9)] for row in range(9)]
+    sketched_values = [[[] for col in range(9)] for row in range(9)] #is it a list so the sketched values could be a nested list?
     game_over = False
 
     while True:
@@ -453,7 +458,7 @@ def main():
 
             if not game_over:
                 if event.type == pygame.KEYDOWN:
-                    if selected is not None:
+                    if selected_cord is not None:
                         if event.key in range(pygame.K_1, pygame.K_9 + 1):  # Check number input
                             num = event.key - pygame.K_0  # Convert key to number
                             if user_input_valid(selected_cord, sudoku):
@@ -470,6 +475,7 @@ def main():
                                 if sketched_values[selected_cord[0]][selected_cord[1]]:
                                     # If not empty, retrieve the last sketched value
                                     value = sketched_values[selected_cord[0]][selected_cord[1]][-1]
+
                                     if sudoku.is_valid(selected_cord[0], selected_cord[1], value):
                                         # Set the value in the board and clear sketched values
                                         board[selected_cord[0]][selected_cord[1]] = value
@@ -509,17 +515,22 @@ def main():
                     rows = pos[1] // 94
                     selected_cord = [rows, cols]
 
-                    # the stuff below is only used by the Cell class so may not be needed if we delete it
+
                     if selected_cord is not None and 0 <= selected_cord[0] < 9 and 0 <= selected_cord[1] < 9:
-                        selected = cells[selected_cord[0]][selected_cord[1]]
+                        #selected = cells[selected_cord[0]][selected_cord[1]]
+                        selected_cord = [rows, cols]
                     else:
-                        selected = None  # or handle the case appropriately
+                        selected_cord = None
+                        #selected = None  # or handle the case appropriately
                     if restart_rect_main.collidepoint(pos):
                         main()
                     elif reset_rect.collidepoint(pos):
                         board = copy.deepcopy(sudoku.board_original)
-                        cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
+                        selected_cord = None
                         sketched_values = [[[] for col in range(9)] for row in range(9)]
+                        draw_numbers(screen, board, selected_cord, sudoku, sketched_values)
+                        #cells = [[Cell(board[row][col], row, col, screen) for col in range(9)] for row in range(9)]
+
                         game_over = False  # Reset game over state if any
                     elif exit_rect.collidepoint(pos):
                         exit()
@@ -539,10 +550,10 @@ def main():
                 screen.blit(reset_text, reset_rect)
                 screen.blit(restart_text_main, restart_rect_main)
                 screen.blit(exit_text, exit_rect)
-                for row in cells:
-                    for cell in row:
-                        if cell.selected: #iterating through is super inefficient so just the selected cell matters
-                            cell.draw()
+                # for row in cells:
+                #     for cell in row:
+                #         if cell.selected: #iterating through is super inefficient so just the selected cell matters
+                #             cell.draw()
 
                 pygame.display.update()
 
