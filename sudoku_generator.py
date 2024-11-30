@@ -446,7 +446,7 @@ def main():
                                     sketched_values[selected_cord[0]][selected_cord[1]].append(num)
                         elif event.key == pygame.K_RETURN:  # Finalize sketched value
                             if sketched_values[selected_cord[0]][selected_cord[1]] != 0:
-                                value = sketched_values[selected_cord[0]][selected_cord[1]][0]
+                                value = sketched_values[selected_cord[0]][selected_cord[1]][-1]
                                 board[selected_cord[0]][selected_cord[1]] = value
                                 sketched_values[selected_cord[0]][selected_cord[1]] = []
                                 selected.set_cell_value(value)
