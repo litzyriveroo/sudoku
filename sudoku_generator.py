@@ -413,7 +413,7 @@ def main():
                     difficulty_selected = True
                     cells_removed = 40
                     sudoku = SudokuGenerator(9, cells_removed)
-                else:
+                elif hard_rect.collidepoint(pos): #I changed this from else to elif because it was only hitting the else due to mouse accuracy?? But now it works
                     difficulty_selected = True
                     cells_removed = 50
                     sudoku = SudokuGenerator(9, cells_removed)
