@@ -342,7 +342,7 @@ def troubleshooter(sudoku = None,board=None,sketched_values=None,selected_cord=N
                     if correct_term != board[i][j] and board[i][j] != 0:
                         print(f"Position: {i},{j} is wrong, it shouldn't be {board[i][j]} and should be {correct_term}")
                         board_test[i][j] = sudoku.board_correct[i][j]
-                if row[j] == 0:
+                if row[j] == 0 and board[i][j] != correct_term:
                     board_test[i][j] = sudoku.board_correct[i][j]
         for row in board_test:
             print(row)
