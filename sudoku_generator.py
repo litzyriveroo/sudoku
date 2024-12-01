@@ -301,7 +301,7 @@ def draw_numbers(screen, board, selected_cord, sudoku_instance, sketched_values)
                 number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 94 + 35, row * 94 + 25))
             elif board[row][col] != 0:  # User-input numbers
-                number = font.render(str(board[row][col]), True, (0, 0, 0))
+                number = font.render(str(board[row][col]), True, (60, 60, 60))
                 screen.blit(number, (col * 94 + 35, row * 94 + 25))
             else:  # Sketched values
                 for idx, sketch in enumerate(sketched_values[row][col]):
