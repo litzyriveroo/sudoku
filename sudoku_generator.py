@@ -445,12 +445,12 @@ def main():
     pygame.display.update()
 
     #((580, 379), (25, 25))
-    # trouble_text = font1.render("Troubleshoot", True, (255, 255, 255), (250, 140, 0))
+    #trouble_text = font1.render("Troubleshoot", True, (255, 255, 255), (250, 140, 0))
     trouble_rect = easy_rect.copy()
     trouble_rect = trouble_rect.move(460,-136)
     trouble_mode = False
-    # screen.blit(trouble_text,trouble_rect)
-    # pygame.display.update()
+    #screen.blit(trouble_text,trouble_rect)
+    #pygame.display.update()
 
     # easy_rect.scale_by_ip(4, 2)
     # medium_rect.scale_by_ip(4, 2)
