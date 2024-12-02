@@ -301,7 +301,7 @@ def draw_numbers(screen, board, selected_cord, sudoku_instance, sketched_values)
                 number = font.render(str(board[row][col]), True, (0, 0, 0))
                 screen.blit(number, (col * 94 + 35, row * 94 + 25))
             elif board[row][col] != 0:  # User-input numbers
-                number = font.render(str(board[row][col]), True, (60, 60, 60))
+                number = font.render(str(board[row][col]), True, (80, 80, 80))
                 screen.blit(number, (col * 94 + 35, row * 94 + 25))
             else:  # Sketched values
                 for idx, sketch in enumerate(sketched_values[row][col]):
@@ -474,8 +474,10 @@ def main():
     bg_image_game_won = pygame.transform.scale(bg_image_game_won, (900, 900))
 
     restart_font = pygame.font.SysFont('Arial', 61)
-    restart_text = restart_font.render("Restart", True, (255, 255, 255))  # "Restart" text
-    restart_rect = restart_text.get_rect(center=(470, 520))  # Position the restart button
+    restart_text = restart_font.render("Restart", True, (255, 255, 255), (250, 140, 0))  # "Restart" text
+    restart_rect = restart_text.get_rect(center=(440, 480))  # Position the restart button
+    exit_text_won = restart_font.render("Exit", True, (255, 255, 255), (250, 140, 0))
+    exit_rect_won = exit_text.get_rect(center = (440, 480))
 
     difficulty_selected = False
     while not difficulty_selected:
@@ -587,7 +589,7 @@ def main():
                     if check_win(board, sudoku):  # Check if the player wins
                         screen.fill((255, 255, 255))
                         screen.blit(bg_image_game_won, (0, 0))
-                        screen.blit(restart_text, restart_rect)
+                        screen.blit(exit_text_won, exit_rect_won)
                         pygame.display.update()
                         game_over = True
                     else:
@@ -629,6 +631,8 @@ def main():
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 if game_over and restart_rect.collidepoint(mouse_x, mouse_y):
                     main()
+                elif game_over and exit_rect.collidepoint(mouse_x, mouse_y):
+                    exit()
 
 
             if not game_over:
